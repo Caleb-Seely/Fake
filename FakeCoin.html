@@ -13,19 +13,27 @@ var helpClicks = 0;
 function clearBody(){
    var b = document.getElementById("bod");
    bod.innerHTML = " ";
+   reset = 0;
+   ansCheck = 0;
 }
 
 function coinSetup() {
    clearBody();
+   reset = 0; //prevent hiding coins when a new pile is selected
+   document.getElementById("weighResults").innerHTML = "";
+   document.getElementById("HideMessage").innerHTML = "";
+   document.getElementById("nextRound").style="visibility:hidden";
+   document.getElementById("Answer").style="visibility:hidden";
+   
    //document.getElementById("coinTotal").style="visibility:hidden;";  //hide the selection list
    //document.getElementById("set").style="visibility:hidden;";
 
    prefer = document.forms[0].coinTotal.value;      //get num of coins
-   fake = Math.floor(Math.random()*prefer);        // get rand num 0-totalCoins
+   fake = Math.floor((Math.random()*prefer) + 1);        // get rand num 0-totalCoins
    var total = prefer.bold();
    var one = "1";
    one = one.bold();
-   document.getElementById("setUp").innerHTML = "You are searching for " + one + " fake coin in a pile of " + total + " coins.<n>Click on a   coin to add it to a pile."; //" Fake is " + fake;
+   document.getElementById("setUp").innerHTML = "You are searching for " + one + " fake coin in a pile of " + total + " coins. <p>Click on a   coin to add it to a pile.";// Fake is " + fake;
    
    var x = document.getElementById("Weigh"); //show the weight button
    x.style="visibility:visible;";
@@ -55,23 +63,25 @@ function coinSetup() {
          if(reset == 1){      //Only after we have weighed for this round
             hideCoins(num);
          }
-         if(ansCheck == 1){
+         else if(ansCheck == 1){
             checkAnswer(num);
          }
-                  
-         this.style.color= text;
-         if(click_count % 3 === 0 ){
-            coinArr[num] = "blue";
-         }
-         if(click_count % 3 === 1 ){
-            coinArr[num] = "green";
-         }
-         if(click_count % 3 === 2 ){
-            coinArr[num] = "red";
-         }
-         click_count++;
-         text = color[click_count % 3];
-         this.style.background = text;
+          else{
+            this.style.color= text;
+            if(click_count % 3 === 0 ){
+               coinArr[num] = "blue";
+            }
+            if(click_count % 3 === 1 ){
+               coinArr[num] = "green";
+            }
+            if(click_count % 3 === 2 ){
+               coinArr[num] = "red";
+            }
+            click_count++;
+            text = color[click_count % 3];
+            this.style.background = text;            
+          }        
+
 
          
          //alert(this.innerHTML);
@@ -79,16 +89,17 @@ function coinSetup() {
       )
   }
 
-  psudoCode();
 }
 
 function hideCoins(num){
 
    var x = document.getElementById("Coin " +num);
-   //document.getElementById("message").innerHTML = "Found " + x.id  ;
+   //document.getElementById("error").innerHTML = "Hding " + x.id  ;
    var i = 0;
-   x.style="visibility:hidden;";
-   coinArr[num] = "Black";
+   //x.style="visibility:hidden;";
+   x.style.background = "grey";
+   x.style.color = "black";
+   coinArr[num] = "black";
    
    //x.style.background = "black";
    //x.disabled = true;
@@ -116,21 +127,21 @@ function weighGroups(){
 
 if(err == 0){
 
-   for(var i = 0; i < prefer; i++){    //Adds up each group
+   for(var i = 0; i <= prefer; i++){    //Adds up each group
      if(i == fake){
         i++;
      }
       result = red.localeCompare(coinArr[i]);
       if(result == 0){
-         r+=1;
+         r= r+1;
       }
       result = green.localeCompare(coinArr[i]);
       if(result == 0){
-         g+= 1;
+         g= g+ 1;
       }
       result = blue.localeCompare(coinArr[i]);
       if(result == 0){
-         b +=1;
+         b = b+1;
       }
       
    }
@@ -156,7 +167,7 @@ if(err == 0){
    document.getElementById("Answer").style="visibility:visible;"; //enable the guess button
 
    //text += "blue " + b + " red " + r + " green " +g;
-   text = "Click on a coin to take it out of the next round.";
+   //text = "Click on a coin to take it out of the next round.";
    document.getElementById("HideMessage").innerHTML = text;
    reset = 1;
 }
@@ -171,6 +182,25 @@ else{
 
 function nextRound(){
    reset = 0;
+   var i = 0;
+   var x;
+   var result;
+   var black = "black";
+   document.getElementById("weighResults").innerHTML ="";
+   for(i = 1; i <= prefer; i++){
+      x = document.getElementById("Coin " +i);
+      result = black.localeCompare(coinArr[i]);
+      if(result == 0){
+         //do nothing
+      }
+      else{       //reset the coins 
+         //document.getElementById("message3").innerHTML = x.id;
+         x.style.background = "yellow";
+         x.style.color = "black";
+      }
+
+
+   }
    document.getElementById("nextRound").style="visibility:hidden;";
    document.getElementById("Weigh").style="visibility:visible;";
 }
@@ -182,9 +212,19 @@ function checkAnswer(ans){
       document.getElementById("Answers").innerHTML = "You are correct!";
       document.getElementById("Answer").style="visibility:hidden;";
       document.getElementById("nextRound").style="visibility:hidden;";
+
+      var i = 0;
+      for(i = 1; i <= prefer; i++){
+         var x = document.getElementById("Coin " + i);
+         if(i != fake){
+            x.style="visibility:hidden";
+         }
+         
+      }
+      document.getElementById("hideMessage").innerHTML = "";
    }
    else{
-      document.getElementById("Answers").innerHTML = "No that is not the correct coin.";
+      document.getElementById("Answers").innerHTML = "No that is not the correct coin. Select a coin to remove it from a pile";
       reset = 1;
    }
 }
@@ -192,7 +232,7 @@ function checkAnswer(ans){
 function psudoCode(){
    helpClicks = helpClicks+1;
 
-   var title="Pseudocode " ;
+   var title="Pseudocode ";
    document.getElementById("psudo").innerHTML = title.bold();
    
    if(helpClicks == 1){
@@ -261,3 +301,4 @@ function setAnsSelection(){
 
 </body>
 </html>
+
