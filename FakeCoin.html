@@ -4,30 +4,48 @@
 <head>
 <script>
 
-var group1 = ["undefined"];
+var coinArr = ["undefined"];
 var fake;
 var reset = 0;
 var ansCheck = 0;
+var helpClicks = 0;
+
+function clearBody(){
+   var b = document.getElementById("bod");
+   bod.innerHTML = " ";
+}
 
 function coinSetup() {
+   clearBody();
+   //document.getElementById("coinTotal").style="visibility:hidden;";  //hide the selection list
+   //document.getElementById("set").style="visibility:hidden;";
 
-  prefer = document.forms[0].coinTotal.value;      
-  fake = Math.floor(Math.random()*prefer);
-  document.getElementById("initcoin").innerHTML = "You are searching for 1 fake coin in a pile of " + prefer + " coins."; //" Fake is " + fake;
-   var x = document.getElementById("Weigh");
+   prefer = document.forms[0].coinTotal.value;      //get num of coins
+   fake = Math.floor(Math.random()*prefer);        // get rand num 0-totalCoins
+   var total = prefer.bold();
+   var one = "1";
+   one = one.bold();
+   document.getElementById("setUp").innerHTML = "You are searching for " + one + " fake coin in a pile of " + total + " coins.<n>Click on a   coin to add it to a pile."; //" Fake is " + fake;
+   
+   var x = document.getElementById("Weigh"); //show the weight button
    x.style="visibility:visible;";
+
    var color = ["red" , "blue", "green"];
  
    var click_count = 0;
    var i ;
    var text = "red";
   
-  for(i = 0; i < prefer; i++ ){
+  for(i = 1; i <= prefer; i++ ){
       //text += "Coin " + i + "<br>";
-      let body = document.getElementsByTagName("body")[0];
+      let body = document.getElementById("bod");
       let button = document.createElement("button");
       button.innerHTML = +i;
       button.id = "Coin " + i;
+      button.style="border-radius: 50%;";
+      button.style.background = "yellow";
+      button.style.width="40px";
+      button.style.height="40px";
       body.appendChild(button);
       body.append(" ");
 
@@ -43,13 +61,13 @@ function coinSetup() {
                   
          this.style.color= text;
          if(click_count % 3 === 0 ){
-            group1[num] = "Blue";
+            coinArr[num] = "blue";
          }
          if(click_count % 3 === 1 ){
-            group1[num] = "Green";
+            coinArr[num] = "green";
          }
          if(click_count % 3 === 2 ){
-            group1[num] = "Red";
+            coinArr[num] = "red";
          }
          click_count++;
          text = color[click_count % 3];
@@ -60,9 +78,8 @@ function coinSetup() {
       }
       )
   }
-  document.getElementById("message").innerHTML = "Here are all the coins <br>Click through them to place them in different piles" ;
 
-  
+  psudoCode();
 }
 
 function hideCoins(num){
@@ -71,73 +88,82 @@ function hideCoins(num){
    //document.getElementById("message").innerHTML = "Found " + x.id  ;
    var i = 0;
    x.style="visibility:hidden;";
+   coinArr[num] = "Black";
+   
+   //x.style.background = "black";
+   //x.disabled = true;
   
 }
 
 
 
 function weighGroups(){
-   
-   tmp = document.forms[0].coinTotal.value;
+
    var text = "";
    var undef = "undefined";
    var result;
-   var red = "Red", blue = "Blue", green="Green" ;
+   var red = "red", blue = "blue", green="green" ;
+
    var r = 0, g = 0 , b = 0;
    var err = 0;
 
-   for(var i = 0; i < tmp; i++){          //looks for any spot in array that is undefined
-      result = undef.localeCompare(group1[i])  
+   for(var i = 0; i < prefer; i++){          //looks for any spot in array that is undefined
+      result = undef.localeCompare(coinArr[i])  
       if(result == 0){    
-            err = 1;                      //Will not proceed with comparrisons if there is an err
+            //err = 1;                      //Will not proceed with comparrisons if there is an err
       } 
    }
 
 if(err == 0){
-   document.getElementById("error").innerHTML = ""
-   for(var i = 0; i < tmp; i++){    //Adds up each group
+
+   for(var i = 0; i < prefer; i++){    //Adds up each group
      if(i == fake){
         i++;
      }
-      result = red.localeCompare(group1[i]);
+      result = red.localeCompare(coinArr[i]);
       if(result == 0){
          r+=1;
       }
-      result = green.localeCompare(group1[i]);
+      result = green.localeCompare(coinArr[i]);
       if(result == 0){
          g+= 1;
       }
-      result = blue.localeCompare(group1[i]);
+      result = blue.localeCompare(coinArr[i]);
       if(result == 0){
          b +=1;
       }
       
    }
-
+    red = red.fontcolor("red");
+    blue = blue.fontcolor("blue");
+    var more = "more", same = "the same"
    if(r > b){
-      document.getElementById("weighResults").innerHTML="The RED pile weighs more than the BLUE pile"
+      document.getElementById("weighResults").innerHTML="The " + red.bold() + " pile weighs " + more.bold() +" than the " + blue.bold() + " pile";
    }
    if(r < b){
-      document.getElementById("weighResults").innerHTML="The BLUE pile weighs more than the RED pile"
+      document.getElementById("weighResults").innerHTML="The " + blue.bold() + " pile weighs " + more.bold() + " than the " + red.bold() + " pile";
    }
    if(r == b){
-      document.getElementById("weighResults").innerHTML="The RED pile weighs the same as the BLUE pile"
+      document.getElementById("weighResults").innerHTML="The " + red.bold() + " pile weighs " + same.bold() + " as the " + blue.bold() + " pile";
    }
 
-   var x = document.getElementById("Weigh");
+   var x = document.getElementById("Weigh"); //hide the weigh button
    x.style="visibility:hidden;";
 
-   x = document.getElementById("nextRound")
+   x = document.getElementById("nextRound")  //enable the next round button
    x.style="visibility:visible;";
-   document.getElementById("Answer").style="visibility:visible;";
+
+   document.getElementById("Answer").style="visibility:visible;"; //enable the guess button
 
    //text += "blue " + b + " red " + r + " green " +g;
-   text = "Use this information to narrow down your search for the fake coin. <p>Click on any coin you do not want in the next round before clicking Start next round"
-   document.getElementById("message").innerHTML = text;
+   text = "Click on a coin to take it out of the next round.";
+   document.getElementById("HideMessage").innerHTML = text;
    reset = 1;
 }
 else{
-   document.getElementById("error").innerHTML = "Please place all coins into a pile. <p>For most efficient results, use an equal number in each pile."
+   var errmsg = "Please place all coins into a pile.";      //should never be called
+   errmsg = errmsg.bold();                                  //allows users to deal with even number piles
+   document.getElementById("error").innerHTML = errmsg;
 }
    
    
@@ -163,6 +189,23 @@ function checkAnswer(ans){
    }
 }
 
+function psudoCode(){
+   helpClicks = helpClicks+1;
+
+   var title="Pseudocode " ;
+   document.getElementById("psudo").innerHTML = title.bold();
+   
+   if(helpClicks == 1){
+      document.getElementById("psudo1").innerHTML = "for 0...n,  group % 3 = i ";
+   }
+   if(helpClicks == 2){
+      document.getElementById("psudo2").innerHTML = "a == b when the fake coin was not weighed";
+   }
+   if(helpClicks == 3){
+      document.getElementById("psudo3").innerHTML = "if n % 3 == 1, for 0...n-1";
+   }
+}
+
 function setAnsSelection(){
    document.getElementById("Answers").innerHTML = "Select the fake";
    ansCheck = 1;
@@ -173,31 +216,48 @@ function setAnsSelection(){
 </head>
 <h1>The Fake Coin Problem</h1>
 <h2>Using Divide and Conquer</h2>
+<p>The fake coin problem attempts to find one counterfit coin (weighing 1 gram less), among a pile of
+    real coins.<p>We use a scale and a Decrease-and-Conquer strategy to find the fake. One method is to recursivley divide the unknown pile into three equal piles until you find the fake coin. This results in a time efficency of log 3(n). 
+   It is worth noting that similar logic can be applied to find any fake coin assuming it has a 
+       weight difference. This example uses a lighter coin for the sake of learning.</p>
 <body>
   
 
 <form>
-How many coins do you want to search through?
+<p id="set">How many coins in the total pile?
   <select id="coinTotal" onchange="coinSetup()">
    <option value="0"></option>
     <option value="3">3</option>
+    <option value="6">6</option>
     <option value="9">9</option>
+    <option value="10">10</option>
     <option value="27">27</option>
     <option value="30">30</option>
+   </p>
   </select>
 </form>
 
 <p id="initcoin"></p>
+<p id="setUp"></p>
+<p id = "bod"></p>
+<input type="button" id="help" value="Help!" onclick="psudoCode()">
+<input style="visibility:hidden;" type="button" id="Weigh" value="Weigh groups" onclick="weighGroups()">
+<input style="visibility:hidden;" type="button" id="nextRound" value="Start next round" onclick="nextRound()">
+<input style="visibility:hidden;" type="button" id="Answer" value="I know the fake!" onclick="setAnsSelection()">
+
 <p id="weighResults"></p>
-<p id="message"></p>
+<p id="HideMessage"></p>
 <p id="message2"></p>
 <p id="message3"></p>
 
 <p id="Answers"></p>
-</p>
+
 <p id="error"></p>
-<input style="visibility:hidden;" type="button" id="Weigh" value="Weigh groups" onclick="weighGroups()">
-<input style="visibility:hidden;" type="button" id="nextRound" value="Start next round" onclick="nextRound()">
-<input style="visibility:hidden;" type="button" id="Answer" value="I know the fake!" onclick="setAnsSelection()">
+
+<p id="psudo"></p>
+<p id="psudo1"></p>
+<p id="psudo2"></p>
+<p id="psudo3"></p>
+
 </body>
 </html>
