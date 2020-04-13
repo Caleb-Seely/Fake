@@ -15,6 +15,7 @@ function clearBody(){
    bod.innerHTML = " ";
    reset = 0;
    ansCheck = 0;
+   
 }
 
 function coinSetup() {
@@ -22,6 +23,7 @@ function coinSetup() {
    reset = 0; //prevent hiding coins when a new pile is selected
    document.getElementById("weighResults").innerHTML = "";
    document.getElementById("HideMessage").innerHTML = "";
+   document.getElementById("Answers").innerHTML = "";
    document.getElementById("nextRound").style="visibility:hidden";
    document.getElementById("Answer").style="visibility:hidden";
    
@@ -30,15 +32,22 @@ function coinSetup() {
 
    prefer = document.forms[0].coinTotal.value;      //get num of coins
    fake = Math.floor((Math.random()*prefer) + 1);        // get rand num 0-totalCoins
+   //fake = getRandomInt(prefer);
    var total = prefer.bold();
    var one = "1";
+   var blueColor = "blue";
+   var redColor = "red";
+   var yellowColor = "yellow";
+   blueColor = blueColor.fontcolor("blue");
+   //yellowColor = yellowColor.fontcolor("yellow");
+   redColor = redColor.fontcolor("red");
    one = one.bold();
-   document.getElementById("setUp").innerHTML = "You are searching for " + one + " fake coin in a pile of " + total + " coins. <p>Click on a   coin to add it to a pile.";// Fake is " + fake;
+   document.getElementById("setUp").innerHTML = "You are searching for " + one + " fake coin in a pile of " + total + " coins. <p>Click on a coin once to add it to the " + blueColor + " pile and twice to add to the " + redColor + " pile.<p>If you would like to take a coin out of a pile, a third click will turn it " + yellowColor.bold() + " and remove it from being weighed."; //fake;
    
    var x = document.getElementById("Weigh"); //show the weight button
    x.style="visibility:visible;";
 
-   var color = ["red" , "blue", "green"];
+   var color = ["red" , "blue"];
  
    var click_count = 0;
    var i ;
@@ -67,23 +76,22 @@ function coinSetup() {
             checkAnswer(num);
          }
           else{
-            this.style.color= text;
-            if(click_count % 3 === 0 ){
-               coinArr[num] = "blue";
-            }
-            if(click_count % 3 === 1 ){
-               coinArr[num] = "green";
-            }
-            if(click_count % 3 === 2 ){
-               coinArr[num] = "red";
-            }
-            click_count++;
-            text = color[click_count % 3];
-            this.style.background = text;            
-          }        
-
-
-         
+             if(this.style.background == "blue"){
+                this.style.background = "red";
+                coinArr[num] = "red";
+             }
+             else if(this.style.background == "red"){
+                this.style.background = "yellow";
+                this.style.color = "black";
+                coinArr[num] = "yellow";
+             }
+             else{
+                this.style.background = "blue";
+                this.style.color = "white";
+                coinArr[num] = "blue";
+             }
+           
+          }          
          //alert(this.innerHTML);
       }
       )
@@ -114,7 +122,7 @@ function weighGroups(){
    var undef = "undefined";
    var result;
    var red = "red", blue = "blue", green="green" ;
-
+   var rCount = 0, bCount = 0;
    var r = 0, g = 0 , b = 0;
    var err = 0;
 
@@ -128,20 +136,29 @@ function weighGroups(){
 if(err == 0){
 
    for(var i = 0; i <= prefer; i++){    //Adds up each group
-     if(i == fake){
-        i++;
-     }
       result = red.localeCompare(coinArr[i]);
       if(result == 0){
-         r= r+1;
-      }
-      result = green.localeCompare(coinArr[i]);
-      if(result == 0){
-         g= g+ 1;
+         if(i == fake){
+            r = r ;
+         }
+         else{
+            r= r+1;  
+         }
+         
+         coinArr[i] = "undefined";
+         rCount++;
       }
       result = blue.localeCompare(coinArr[i]);
       if(result == 0){
-         b = b+1;
+         if(i == fake){
+            b = b;
+         }
+         else{
+            b = b+1;
+         }
+         
+         coinArr[i] = "undefined"
+         bCount++;
       }
       
    }
@@ -168,15 +185,15 @@ if(err == 0){
 
    //text += "blue " + b + " red " + r + " green " +g;
    //text = "Click on a coin to take it out of the next round.";
-   document.getElementById("HideMessage").innerHTML = text;
+   document.getElementById("HideMessage").innerHTML = "Now select the coins you do not want to consider in the next round. <p>If you accidentally select the wrong coin, you can still add it to a pile in the next round."
+   if( rCount != bCount){
+      text = "Warning, you are weighing unequal number of coins.";
+   }
+   document.getElementById("error").innerHTML = text.bold();
    reset = 1;
-}
-else{
-   var errmsg = "Please place all coins into a pile.";      //should never be called
-   errmsg = errmsg.bold();                                  //allows users to deal with even number piles
-   document.getElementById("error").innerHTML = errmsg;
-}
-   
+   b = 0;
+   r = 0;
+}  
    
 }
 
@@ -187,6 +204,8 @@ function nextRound(){
    var result;
    var black = "black";
    document.getElementById("weighResults").innerHTML ="";
+   document.getElementById("HideMessage").innerHTML = "Grey coins can still be added used.";
+   document.getElementById("error").innerHTML = "";
    for(i = 1; i <= prefer; i++){
       x = document.getElementById("Coin " +i);
       result = black.localeCompare(coinArr[i]);
@@ -201,6 +220,11 @@ function nextRound(){
 
 
    }
+   var i = 0;
+   for(i  = 0; i < prefer; i++){
+      coinArr[i] = "undefined";
+   }
+
    document.getElementById("nextRound").style="visibility:hidden;";
    document.getElementById("Weigh").style="visibility:visible;";
 }
@@ -251,11 +275,13 @@ function setAnsSelection(){
    ansCheck = 1;
    reset = 0;
 }
+//all the js functions
+</script>      
 
-</script>
 </head>
-<h1>The Fake Coin Problem</h1>
-<h2>Using Divide and Conquer</h2>
+<script>createHeader("The Fake Coin Problem using Divide and Conquer")</script>
+<h1></h1>
+<h2></h2>
 <p>The fake coin problem attempts to find one counterfit coin (weighing 1 gram less), among a pile of
     real coins.<p>We use a scale and a Decrease-and-Conquer strategy to find the fake. One method is to recursivley divide the unknown pile into three equal piles until you find the fake coin. This results in a time efficency of log 3(n). 
    It is worth noting that similar logic can be applied to find any fake coin assuming it has a 
