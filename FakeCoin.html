@@ -1,14 +1,23 @@
 <!DOCTYPE html>
 <html>
-    
 <head>
+   <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+   <!-- Chrome browser will display response in the form of html page by using above line. -->
+   <link rel="stylesheet" href="general.css">
+   <script type="text/javascript" src="../general.js"></script>
+   <script type="text/javascript" src="../tableFunctions.js"></script>
+   <script type="text/javascript" src="../headerFunction.js"></script>
+   <script type="text/javascript" src="../pseudocodeFunctions.js"></script>
 <script>
 
 var coinArr = ["undefined"];
 var fake;
 var reset = 0;
 var ansCheck = 0;
-var helpClicks = 0;
+
+var groupSelect = 0;
+var eliminate = 0;
 
 function clearBody(){
    var b = document.getElementById("bod");
@@ -26,7 +35,14 @@ function coinSetup() {
    document.getElementById("Answers").innerHTML = "";
    document.getElementById("nextRound").style="visibility:hidden";
    document.getElementById("Answer").style="visibility:hidden";
-   
+   document.getElementById("showMe").style="visibility:visible";
+   document.getElementById("psudo2").innerHTML = "";
+   document.getElementById("psudo3").innerHTML = "";
+   groupSelect = 1;     //for the Show me button to know where we are
+   Element = 0;
+   var title="Pseudocode ";
+   document.getElementById("psudo").innerHTML = title.bold();
+   document.getElementById("psudo1").innerHTML = "x = 2/3n <p>for 0...x,  coin x%2 => group1 else coin x =>group2 ";
    //document.getElementById("coinTotal").style="visibility:hidden;";  //hide the selection list
    //document.getElementById("set").style="visibility:hidden;";
 
@@ -65,6 +81,7 @@ function coinSetup() {
       button.style.height="40px";
       body.appendChild(button);
       body.append(" ");
+      coinArr[i] = "yellow";
 
       button.addEventListener ("click", function() {
          var num = this.innerHTML;
@@ -125,6 +142,8 @@ function weighGroups(){
    var rCount = 0, bCount = 0;
    var r = 0, g = 0 , b = 0;
    var err = 0;
+   eliminate = 1;
+   groupSelect = 0;
 
    for(var i = 0; i < prefer; i++){          //looks for any spot in array that is undefined
       result = undef.localeCompare(coinArr[i])  
@@ -145,7 +164,7 @@ if(err == 0){
             r= r+1;  
          }
          
-         coinArr[i] = "undefined";
+         //coinArr[i] = "yellow";
          rCount++;
       }
       result = blue.localeCompare(coinArr[i]);
@@ -157,7 +176,7 @@ if(err == 0){
             b = b+1;
          }
          
-         coinArr[i] = "undefined"
+         //coinArr[i] = "yellow"
          bCount++;
       }
       
@@ -190,6 +209,7 @@ if(err == 0){
       text = "Warning, you are weighing unequal number of coins.";
    }
    document.getElementById("error").innerHTML = text.bold();
+   document.getElementById("psudo2").innerHTML = "if a == b<p>Eliminate groups a and b, repeat step 1.<p>Else eliminate other group and a or b, repeat step 1.";
    reset = 1;
    b = 0;
    r = 0;
@@ -205,6 +225,7 @@ function nextRound(){
    var black = "black";
    document.getElementById("weighResults").innerHTML ="";
    document.getElementById("HideMessage").innerHTML = "Grey coins can still be added used.";
+   document.getElementById("psudo3").innerHTML = "Repeat steps 1 and 2 until one coin remains";
    document.getElementById("error").innerHTML = "";
    for(i = 1; i <= prefer; i++){
       x = document.getElementById("Coin " +i);
@@ -222,7 +243,7 @@ function nextRound(){
    }
    var i = 0;
    for(i  = 0; i < prefer; i++){
-      coinArr[i] = "undefined";
+      coinArr[i] = "yellow";
    }
 
    document.getElementById("nextRound").style="visibility:hidden;";
@@ -233,9 +254,11 @@ function checkAnswer(ans){
 
    
    if(ans == fake){
-      document.getElementById("Answers").innerHTML = "You are correct!";
+      var correct = "You are correct!"
+      document.getElementById("Answers").innerHTML = correct.bold();
       document.getElementById("Answer").style="visibility:hidden;";
       document.getElementById("nextRound").style="visibility:hidden;";
+      document.getElementById("showMe").style="visibility:hidden;";
 
       var i = 0;
       for(i = 1; i <= prefer; i++){
@@ -253,21 +276,45 @@ function checkAnswer(ans){
    }
 }
 
-function psudoCode(){
-   helpClicks = helpClicks+1;
-
-   var title="Pseudocode ";
-   document.getElementById("psudo").innerHTML = title.bold();
+function showMe(){
    
-   if(helpClicks == 1){
-      document.getElementById("psudo1").innerHTML = "for 0...n,  group % 3 = i ";
+   var x;
+   var mod = 0;
+   
+   if(groupSelect == 1){
+      for( let i = 1; i <= prefer; i++){
+         mod = i % 3;
+         //console.log(prefer);
+         if(mod == 1){
+            x = document.getElementById("Coin "+i);
+            x.style.background = "blue";
+            x.style.color = "white";
+            coinArr[i] = "blue";
+         }
+         if(mod == 2){
+            x = document.getElementById("Coin "+i);
+            x.style.background = "red";
+            x.style.color = "white";
+            coinArr[i] = "red";
+         }
+
+      }
    }
-   if(helpClicks == 2){
-      document.getElementById("psudo2").innerHTML = "a == b when the fake coin was not weighed";
+   else if(eliminate == 1){
+      var coin;
+      var x = coinArr[fake];
+      console.log("The fake is color " + x + " spot " + fake );
+
+      for(let i = 1; i <= prefer; i++){
+         if(coinArr[i] != x){
+            coin = document.getElementById("Coin " +i);
+            coin.style.background = "grey";
+            coinArr[i] = "black";
+         }
+      }
    }
-   if(helpClicks == 3){
-      document.getElementById("psudo3").innerHTML = "if n % 3 == 1, for 0...n-1";
-   }
+   
+
 }
 
 function setAnsSelection(){
@@ -279,6 +326,8 @@ function setAnsSelection(){
 </script>      
 
 </head>
+
+<body onload="welcome()"></body>
 <script>createHeader("The Fake Coin Problem using Divide and Conquer")</script>
 <h1></h1>
 <h2></h2>
@@ -297,6 +346,7 @@ function setAnsSelection(){
     <option value="6">6</option>
     <option value="9">9</option>
     <option value="10">10</option>
+    <option value="18">18</option>
     <option value="27">27</option>
     <option value="30">30</option>
    </p>
@@ -306,7 +356,7 @@ function setAnsSelection(){
 <p id="initcoin"></p>
 <p id="setUp"></p>
 <p id = "bod"></p>
-<input type="button" id="help" value="Help!" onclick="psudoCode()">
+<input style="visibility:hidden;" type="button" id="showMe" value="Show Me" onclick="showMe()">
 <input style="visibility:hidden;" type="button" id="Weigh" value="Weigh groups" onclick="weighGroups()">
 <input style="visibility:hidden;" type="button" id="nextRound" value="Start next round" onclick="nextRound()">
 <input style="visibility:hidden;" type="button" id="Answer" value="I know the fake!" onclick="setAnsSelection()">
